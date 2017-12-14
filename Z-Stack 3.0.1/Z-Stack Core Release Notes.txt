@@ -1,0 +1,33 @@
+Texas Instruments, Inc.
+
+Z-Stack Core Release Notes
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Version 2.7.1
+May 10, 2017
+
+Notices:
+ - Z-Stack 2.7.1 has been certified as a ZigBee Compliant Platform (ZCP)
+
+Changes:
+- Green Power Stub now uses MAC timestamp to schedule GPDF
+
+- NLME_InitNv() now returns a bit mask of the possible failing status
+
+- Added gZDSECMGR_TC_ATTEMPT_DEFAULT_KEY that if set on TRUE, allows joining devices attempting Install Codes during joining to fallback on default key usage during the same attempt to join a network. This is set to FALSE as  default.
+ 
+ 
+Bug Fixes:
+- Fix a bug that causes ZC to not process Network leave indications
+
+- Fix a bug that ZR with the flag zgNwkLeaveRequestAllowed set in FALSE to do not process network leave indications
+ 
+- APS TCLK index now uses uint16 which allows TCLK table to be expanded further than 255 entries.
+
+- Fixed a bug that causes that after setting an Install Code, the global centralized default key could not be set back again.
+
+- Fixed a bug that cause GP data frames with application ID = 2, to be authenticated/decripted incorrectly.
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------

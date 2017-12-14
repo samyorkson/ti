@@ -1,0 +1,122 @@
+Texas Instruments, Inc.
+
+Z-Stack 3.0.1 Release Notes
+
+---
+
+Version 3.0.1
+May 10, 2017
+
+Notices:
+
+ Z-Stack 3.0.1 meet the requirements for full conformance to ZigBee 3.0, including Base Device Behaviour 1.0, GreenPower Basic Proxy, and ZCL 6. The Z-Stack 3.0.1 release is based on Z-Stack Core 2.7.1 - see the "Z-Stack Core Release Notes" for details.
+
+ The sample application user interface is described in details in the header comment in the following files: The common interface is described in Projects\zstack\HomeAutomation\Source\zcl_sampleapps_ui.c and each application's specific interface is described in the respective files: Projects\zstack\HomeAutomation\Sample###\Source\zcl_Sample###.c 
+ 
+ Z-Stack projects specify compile options in two ways: (1) "-D" statements in f8wConfig.cfg and other *.cfg files, (2) entries in the IDE Compiler Preprocessor Defined Symbols. When using the EW8051 compiler, settings made in the IDE will override settings in the *.cfg files. When using the EWARM compiler, settings in the *.cfg files will override any made in the IDE.  
+
+ When programming devices for the first time with this release, the entire Flash memory should be erased. For the CC2530/1 platforms, select "Erase Flash" in the "Debugger->Texas Instruments->Download" tab of the project options. For the CC2538, select "Project->Download->Erase Memory".
+
+ Application, library, and hex files were built/tested with the following versions of IAR tools and may not work with different IAR tool versions:   - CC2538 + SRF06EB:  EWARM  8.11.1  (8.11.1.13272)   - CC2530 + SRF05EB:  EW8051 10.10.1 (10.10.1)
+	 
+ Foundation software library files for the CC2538 include the following:
+ - bsp.lib, version 1.3.1
+ - driverlib.lib, version 1.3.1
+ - usblib.lib, version 1.0.1
+ 
+ Test for BDB conformance was done with ZTT 1.0.2.2 using a related sample application to validate the features tested in BDB test spec (14-0439-22).
+ 
+ Serial Bootloader and OTA functionalities were tested.
+ 
+ ZNP projects were tested to be backward compatible with previous versions of Linux gateway device and to support Z3.0 MT interface and commands.
+ 
+ ZDApp states supported: DEV_HOLD, DEV_INIT, DEV_END_DEVICE, DEV_ROUTER, DEV_ZB_COORD and DEV_NWK_ORPHAN. ZDApp may notify other states that may not be accurate. User should only use supported states or rely on BDB notifications by registering the proper callbacks (commissioning, bindings, identify notifications).
+ 
+ TouchLink were tested only for SampleLight (TL Target) and SampleSwitch (TL Initiator) applications.
+
+ Generic app for CC2531 target was added.
+
+------------------------
+  
+Changes:
+
+- F&B process now query the IEEE address of the target devices prior creating the unicast binds, if no IEEE address is stored in the address manager. Also if the IEEE address cannot be received from the remote device, the bind is not created.
+
+- Binds to be added are now validated to not register invalid endpoints (neither source or destination endpoints). Unicast bind validate input parameters: IEEE Address and endpoint, while Group Binds validates Group ID.
+
+- MT interface UTIL_GET_DEVICE_INFO returns as NumAssocDevices only RFD (Reduce Function Devices also known as End Devices) and do not longer include Router devices. To query RFD or router devices, use MT ZDO commands such as Mgmt LQI (returns RFD and Router devices). MT ZDO network address request with extended parameters was also validated which will also return RFD devices. zgZdoDirectCB is enabled by default to allow these ZDO command processing for devices that have serial interface enabled.
+
+- BDB commissioning for initialization only will now trigger a BDB notification with failing status if the device was not preously commissioned to a network.
+
+- ZED now supports ZDO network address request as is mandatory in Z3.0.
+
+- Added ACCESS_GLOBAL attribute access control to allow attributes to be accessible from both sides of a cluster at the same time. This is the case, for example, of Global Attribute ZCL Cluster revision when a F&B Initiator device must implement Identify cluster as both Client and Server.
+
+- BDB is now registering ZDO callbacks for NodeDescriptor,  SimpleDescriptror and IEEE address responses to perform its own processing instead of processing in the ZDO callback context.
+
+- Remove MT interface MT_ZdoStartupFromAppEx().
+
+- MT interface MT_ZdoStartupFromApp() is now consistent with the behavior from HA1.2.2a release (ZC calls Formation, ZR and ZED calls network steering).
+
+- Added API to stop F&B as Initiator.
+
+- F&B for group binds now request APS ack to devices being added to binding table. This will increase reliability by giving APS retries to add the devices to the groups.
+
+- Doorlock optional command processing are now enabled by ZCL_DOORLOCK_EXT compilation flag.
+
+- Added a flag to disable Green Power Basic Proxy application for custom network development. See DISABLE_GREENPOWER_BASIC_PROXY.
+
+- ZNP workspace/binaries renamed to clarify the build outputs. Refer to ReadMe.txt files in /bin and /dev for the description of the default binaries provided.
+------------------------
+
+Fixes:
+
+- Fixed malformed APS ACKs for APS commands.
+
+- Disabling NV_RESTORE compilation flag sets the device to factory new state and also erase the network frame counter.
+
+- ZDO network address request processing for ZED, that caused to return wrong values when the parent was not a coordinator.
+
+- CC2538 ZC will not longer hold frames until another is received during joining procedure for joining devices if the network do have high amount of traffic in the channel.
+
+- Fixed a bug that caused that a commissioned device perform a Factory New reset if the device power cycled after and discovery process failed before the successful joining.
+
+- Corrected several potential memory leak areas.
+
+- Fix for Z3.0 devices that joins legacy networks to validate the APS counter.
+
+- Fix MT interface for BDB notifications to return the right remaining commissioning methods.
+
+- Fix ZDO commands (Network address and IEEE address requests) with failing status will not longer change the address of interest parameter to the local device address.
+
+- Fix ZCL foundation command Write-Attribute-No-Response command to not generate default response command.
+
+- Fix an issue with F&B that was notifying the application a wrong endpoint to be set in identify mode.
+
+- Foundation command to write Identify attribute now triggers Identify and the application is notified in the registered BDB callback for this purpose.
+
+- ZDO commands (network address and IEEE address requests) with DEVICE_NOT_FOUND status will now set the address of interest to an invalid address 0xFF's.
+
+- Fix ZCL basic cluster attributes (ATTRID_BASIC_POWER_SOURCE and ATTRID_BASIC_PHYSICAL_ENV) data types to use ZCL_DATATYPE_ENUM8.
+
+- Sample application now supports Discovery commands as per Z3.0. Attributes were order in desendent order to allow correct Discovery command processing. Further changes to attribute list structure must be consistent with the attribute order per cluster.
+
+- Fix a bug that caused that when zgAllowRemoteTCPolicyChange policy was set to FALSE, the coordiantor could not open the network.
+
+- Fix a bug that if requestNewTrustCenterLinkKey is set to FALSE and the joining device joins a centralized network, the device performs a FN reset upon power cycle.
+
+
+Notes:
+
+ - During F&B with more than one device, the discovery process of the F&B (broadcast of IdentifyQuery and reception of IdentifyQueryRsp) may initially fail for some of the devices. The process is automatically retried by the stack every 15 seconds during 180 seconds, to make sure all the required devices can be found. This behaviour is controlled by the macro FINDING_AND_BINDING_PERIODIC_ENABLE.
+
+ - ZNP devices do not support GP Commissioning for GPD that request to change channel to perform bidirectional commissioning.
+ 
+ - To perform FN reset via MT interface, both ZCD_STARTOPT_DEFAULT_CONFIG_STATE and ZCD_STARTOPT_DEFAULT_NETWORK_STATE must be set when writing to NV start-up options.
+ 
+ - In big networks, it is recommended to all joining and rejoining process have a random jitter that needs to be tuned accordingly to the size of the network and the distribution of the nodes, to allow the joining process to be performed correctly.
+ 
+
+
+
+ 
