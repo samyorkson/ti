@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<workspace>
+  <project>
+    <path>$WS_DIR$\QCApp.ewp</path>
+  </project>
+  <batchBuild>
+    <batchDefinition>
+      <name>ALL</name>
+      <member>
+        <project>QCApp</project>
+        <configuration>CoordinatorEB</configuration>
+      </member>
+      <member>
+        <project>QCApp</project>
+        <configuration>RouterEB</configuration>
+      </member>
+      <member>
+        <project>QCApp</project>
+        <configuration>EndDeviceEB</configuration>
+      </member>
+      <member>
+        <project>QCApp</project>
+        <configuration>RouterZLight</configuration>
+      </member>
+    </batchDefinition>
+  </batchBuild>
+</workspace>
+
+
